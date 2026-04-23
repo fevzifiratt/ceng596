@@ -1,0 +1,13 @@
+.venv/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+
+data/raw/
+index/
+runs/
+evals/
+*.trec.tmp
+
+.ipynb_checkpoints/
