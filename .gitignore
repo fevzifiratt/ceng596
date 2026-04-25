@@ -3,11 +3,13 @@
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
 
-data/raw/
-index/
-runs/
-evals/
+# Generated artefacts (anchored to repo root so we don't shadow src/ir596/index/)
+/data/raw/
+/index/
+/runs/
+/evals/
 *.trec.tmp
 
 .ipynb_checkpoints/
