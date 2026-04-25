@@ -58,3 +58,19 @@ Produces `index/{stemmed,unstemmed}/`, `runs/bm25_*.trec`, and appends
 rows to `evals/summary.csv`. First run ~2 min, re-runs ~30 s.
 
 Locked baseline: `bm25_stemmed_title_desc` → MAP 0.3344, NDCG@10 0.5028.
+
+## Step 3 — BM25 tuning (k1, b grid search)
+
+```bash
+.venv/bin/python scripts/step3_tune_bm25.py
+```
+
+Sweeps a 6×4 grid (`k1 ∈ {0.6..2.1}`, `b ∈ {0.25..1.0}`) on the locked
+baseline config (stemmed index, title+desc queries) using a single
+`pt.Experiment`. Produces `evals/bm25_grid.csv` (full grid),
+`runs/bm25_tuned_title_desc.trec` (winner re-run), and appends a
+`bm25_tuned` row to `evals/summary.csv`. Runtime ~2 min.
+
+Tuned baseline: `k1=1.80, b=0.50` → MAP 0.3396, NDCG@10 0.5059
+(+1.6% MAP over Terrier defaults). This is the reference Stage-2
+techniques have to beat.
