@@ -74,3 +74,15 @@ baseline config (stemmed index, title+desc queries) using a single
 Tuned baseline: `k1=1.80, b=0.50` → MAP 0.3396, NDCG@10 0.5059
 (+1.6% MAP over Terrier defaults). This is the reference Stage-2
 techniques have to beat.
+
+## Step 4 — Extended Boolean retrieval
+
+```bash
+.venv/bin/python scripts/step4_extended_boolean.py
+```
+
+Builds a repo-local postings cache from the AP corpus and evaluates a
+small p-norm grid over both query fields (`title`, `title_desc`) using a
+soft-OR Extended Boolean model. Produces
+`index/ext_boolean_nostop.pkl.gz`, `runs/extbool_*.trec`, and appends
+rows to `evals/summary.csv`.

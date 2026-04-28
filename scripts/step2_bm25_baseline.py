@@ -17,8 +17,12 @@ Run from the repo root::
 """
 from __future__ import annotations
 
+import sys
 import time
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "src"))
 
 import pyterrier as pt
 
@@ -26,8 +30,6 @@ from ir596.evaluate import evaluate
 from ir596.index.build_index import IndexVariant, build, index_path
 from ir596.retrieval.bm25 import bm25
 from ir596.retrieval.topics import QueryField, topics_df
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _hr(title: str) -> None:
