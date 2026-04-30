@@ -86,3 +86,19 @@ small p-norm grid over both query fields (`title`, `title_desc`) using a
 soft-OR Extended Boolean model. Produces
 `index/ext_boolean_nostop.pkl.gz`, `runs/extbool_*.trec`, and appends
 rows to `evals/summary.csv`.
+
+## Step 5 — Pseudo-relevance feedback (Rocchio)
+
+```bash
+.venv/bin/python scripts/step5_rocchio_prf.py
+```
+
+Layers Rocchio-style PRF on top of the Step-3 tuned BM25 baseline
+(`k1=1.80, b=0.50`). Pipeline per config:
+`BM25 >> QE >> BM25`, where the QE rewriter takes the top `fb_docs`
+results from the first BM25 as pseudo-relevant and rewrites the
+query for the final retrieval. Sweeps three Rocchio-family expansion
+models — `Bo1`, `KL`, `RM3` — at `fb_docs ∈ {3, 5, 10}` with
+`fb_terms=10`, on `title_desc`, plus a `title`-only control matching
+the proposal's recipe (Bo1, top-5). Produces `runs/prf_*.trec`,
+`evals/prf_grid.csv`, and appends rows to `evals/summary.csv`.
