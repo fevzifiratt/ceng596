@@ -10,6 +10,7 @@ __pycache__/
 /index/
 /runs/
 /evals/
+/nltk_data/
 *.trec.tmp
 
 .DS_Store

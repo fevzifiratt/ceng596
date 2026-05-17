@@ -102,3 +102,37 @@ models — `Bo1`, `KL`, `RM3` — at `fb_docs ∈ {3, 5, 10}` with
 `fb_terms=10`, on `title_desc`, plus a `title`-only control matching
 the proposal's recipe (Bo1, top-5). Produces `runs/prf_*.trec`,
 `evals/prf_grid.csv`, and appends rows to `evals/summary.csv`.
+
+## Step 6 — WordNet Synonym Expansion
+
+```bash
+.venv/bin/python -c "import nltk; nltk.download('wordnet', download_dir='nltk_data'); nltk.download('omw-1.4', download_dir='nltk_data')"
+.venv/bin/python scripts/step6_wordnet_vs_prf.py
+```
+
+Applies conservative WordNet synonym expansion on top of the tuned BM25
+baseline (`k1=1.80`, `b=0.50`) and reports MAP deltas against both tuned
+BM25 and the best Step-5 PRF baseline. Produces
+`evals/wordnet_vs_prf.csv` and `runs/wordnet_tuned_title_desc.trec`.
+
+## Step 7 — Word2Vec AP88 Expansion
+
+```bash
+.venv/bin/python scripts/step7_word2vec.py
+```
+
+Trains or reuses an AP88-specific Word2Vec model and applies
+conservative nearest-neighbour query expansion on top of tuned BM25.
+Produces `evals/word2vec_ap88.csv` and
+`runs/word2vec_tuned_title_desc.trec`.
+
+## Step 8 — Tolerant Retrieval
+
+```bash
+.venv/bin/python scripts/step8_tolerant_retrieval.py
+```
+
+Builds a tolerant vocabulary cache with BK-tree spelling lookup plus
+permuterm wildcard expansion, then evaluates that rewrite independently
+on top of tuned BM25. Produces `evals/tolerant_retrieval.csv` and
+`runs/tolerant_tuned_title_desc.trec`.

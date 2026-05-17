@@ -12,6 +12,8 @@ dependencies = [
     "python-terrier>=1.0",
     "pandas>=2.0",
     "pytrec_eval-terrier>=0.5",
+    "nltk>=3.9",
+    "gensim>=4.4",
 ]
 
 [tool.setuptools.packages.find]

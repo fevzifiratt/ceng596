@@ -123,7 +123,8 @@ def main() -> int:
     _hr("Done")
     print(
         f"Tuned baseline locked: k1={best['k1']:.2f}, b={best['b']:.2f}, "
-        f"MAP={best['map']:.4f}.  This is the new reference for Step 4 (PRF)."
+        f"MAP={best['map']:.4f}.  This is the new reference for Step 5 "
+        f"(Rocchio PRF)."
     )
     return 0
 
