@@ -231,8 +231,8 @@ def rewrite_query(
     if not terms:
         return ""
 
-    expanded = list(terms)
-    seen = set(terms)
+    expanded: list[str] = [term for term in terms if "*" not in term]
+    seen = set(expanded)
     for idx, term in enumerate(terms):
         if idx >= expand_only_first_n_terms:
             break
@@ -255,6 +255,9 @@ def rewrite_query(
                     max_distance=max_edit_distance,
                     max_terms=max_spelling_variants,
                 )
+            elif term not in seen:
+                expanded.append(term)
+                seen.add(term)
 
         for candidate in candidates:
             if candidate in seen:
@@ -262,7 +265,7 @@ def rewrite_query(
             expanded.append(candidate)
             seen.add(candidate)
 
-    return " ".join(expanded)
+    return " ".join(expanded or [term for term in terms if "*" not in term])
 
 
 def expand_topics(

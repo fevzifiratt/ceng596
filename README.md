@@ -4,6 +4,16 @@ CENG 596 course project. Two-stage retrieval pipeline built over the
 Associated Press 1988 newswire corpus, evaluated with standard TREC
 metrics (MAP, NDCG@10, P@10).
 
+## Demo UI
+
+```bash
+.venv/bin/python -m streamlit run app.py
+```
+
+Opens a local query UI for trying the project pipelines interactively:
+tuned BM25, PRF, Extended Boolean, WordNet, Word2Vec, and tolerant
+retrieval with snippets.
+
 ## Layout
 
 ```
