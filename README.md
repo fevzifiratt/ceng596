@@ -155,3 +155,27 @@ Builds a tolerant vocabulary cache with BK-tree spelling lookup plus
 permuterm wildcard expansion, then evaluates that rewrite independently
 on top of tuned BM25. Produces `evals/tolerant_retrieval.csv` and
 `runs/tolerant_tuned_title_desc.trec`.
+
+## Results
+
+Headline numbers on AP88 (50 topics, full qrels). Full per-config table
+lives in `evals/summary.csv`.
+
+| Config                                     | MAP    | NDCG@10 | Δ MAP vs. tuned BM25 |
+| ------------------------------------------ | ------ | ------- | -------------------- |
+| BM25 baseline (stemmed, title+desc)        | 0.3344 | 0.5028  | —                    |
+| **BM25 tuned** (`k1=1.80`, `b=0.50`)       | 0.3396 | 0.5059  | reference            |
+| Extended Boolean (best, `p=1.5`, t+d)      | 0.2290 | 0.3448  | −32.6%               |
+| WordNet expansion                          | 0.3360 | 0.4987  | −1.1%                |
+| Word2Vec AP88 expansion                    | 0.3320 | 0.4958  | −2.2%                |
+| Tolerant retrieval (no triggered rewrites) | 0.3396 | 0.5059  | ±0.0%                |
+| **PRF Bo1, `fb_docs=3`, t+d (winner)**     | 0.3737 | 0.5216  | **+10.0%**           |
+| PRF KL, `fb_docs=3`, t+d                   | 0.3711 | 0.5134  | +9.3%                |
+| PRF Bo1, `fb_docs=5`, title-only          | 0.3706 | 0.5261  | +9.1%                |
+
+Stage-2 takeaway: classical Rocchio-style PRF (`Bo1` / `KL`) is the only
+expansion technique that meaningfully beats the tuned BM25 baseline on
+this corpus. WordNet and Word2Vec expansions stay close to baseline,
+Extended Boolean underperforms, and tolerant retrieval is neutral on
+clean topic strings (it's a recall-side safety net for typos and
+wildcards, not a precision booster).
