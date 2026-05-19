@@ -4,6 +4,15 @@ CENG 596 course project. Two-stage retrieval pipeline built over the
 Associated Press 1988 newswire corpus, evaluated with standard TREC
 metrics (MAP, NDCG@10, P@10).
 
+## Setup
+
+```bash
+.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install -e .
+```
+
+Required before running the demo UI or any of the step scripts below.
+
 ## Demo UI
 
 ```bash
@@ -14,15 +23,18 @@ Opens a local query UI for trying the project pipelines interactively:
 tuned BM25, PRF, Extended Boolean, WordNet, Word2Vec, and tolerant
 retrieval with snippets.
 
+Requires Step 1 (data prep) to have been run at least once so the
+Terrier indexes and parsed topics/qrels are on disk.
+
 ## Layout
 
 ```
+app.py                   Streamlit demo UI
 src/ir596/
   config.py              paths + hyperparameters
   io/                    corpus / topics / qrels parsers
   index/                 PyTerrier indexing
   retrieval/             BM25, PRF, WordNet, Word2Vec, tolerant, ext-boolean
-  app/                   Streamlit demo UI
 data/
   raw/coll               AP collection (gitignored)
   topics/topics.trec     parsed topics (produced by scripts/step1_sanity_check.py)
@@ -31,24 +43,22 @@ index/                   Terrier index (gitignored)
 runs/                    per-config .trec run files
 evals/                   trec_eval summaries
 scripts/                 one-shot entry points, one per milestone step
-reports/                 progress + final report
-notebooks/               EDA + ablation plots
 ```
 
 ## Data location
 
-The corpus lives outside the repo. Default path:
+The corpus lives in `data/raw/` (gitignored), with this layout:
 
 ```
-~/Downloads/AssociatedPressDataset-20260423T115119Z-3-001/AssociatedPressDataset/
+data/raw/
+  coll/                  AP collection files
+  topics1-50.docx        topics
+  qrels1-50ap.docx       qrels
 ```
-
-Override with the env var `AP_DATA_ROOT` if you keep it elsewhere.
 
 ## Step 1 — data prep (run once)
 
 ```bash
-.venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/step1_sanity_check.py
 ```
 
@@ -58,7 +68,6 @@ corpus stats. Expected: 79923 docs, 50 topics, qrels all valid.
 ## Step 2 — BM25 baseline
 
 ```bash
-.venv/bin/pip install -e .
 .venv/bin/python scripts/step2_bm25_baseline.py
 ```
 
