@@ -52,7 +52,18 @@ EXAMPLE_QUERIES = [
     "right wing christian fundamentalism",
     "accusations of cheating by contractors on defense projects",
     "prison overcrowding",
+    "drug enforcement administration arrests",
+    "computer security and hackers",
+    "nuclear power plant safety",
+    "airline safety records",
+    "soviet military buildup in eastern europe",
+    "stock market crash and recovery",
+    "acid rain environmental damage",
+    "AIDS treatment and research funding",
+    "iran contra affair investigation",
     "wildcard demo: insur* coverage",
+    "wildcard demo: pollut* control",
+    "wildcard demo: democ* movement",
 ]
 
 
@@ -204,6 +215,22 @@ def _rewrite_preview(mode: str, query: str) -> str | None:
     return None
 
 
+def _render_rewrite(original: str, rewrite: str) -> str:
+    original_tokens = {tok.lower().strip("*") for tok in original.split() if tok}
+    chips: list[str] = []
+    for token in rewrite.split():
+        cls = "original" if token.lower().strip("*") in original_tokens else "expansion"
+        chips.append(
+            f'<span class="rewrite-chip {cls}">{html.escape(token)}</span>'
+        )
+    return (
+        '<div class="rewrite-card">'
+        '<div class="rewrite-label">Rewritten query</div>'
+        f'<div class="rewrite-chips">{"".join(chips)}</div>'
+        '</div>'
+    )
+
+
 def _run_search(
     mode: str,
     query: str,
@@ -236,41 +263,123 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+      html, body, [class*="css"], .stApp, .stMarkdown, .stMarkdown p,
+      .stTextInput input, .stSelectbox div[data-baseweb="select"] *,
+      .stButton button, .stSlider, .stCaption, label, .stRadio, .stCheckbox {
+        font-size: 1.15rem !important;
+      }
       .stApp {
         background:
           radial-gradient(circle at top left, #f8ead4 0%, transparent 28%),
           radial-gradient(circle at top right, #dcefe6 0%, transparent 25%),
           linear-gradient(180deg, #f7f4ee 0%, #fcfbf8 100%);
       }
+      [data-testid="stSidebar"] * {
+        font-size: 1.05rem !important;
+      }
+      [data-testid="stSidebar"] h2,
+      [data-testid="stSidebar"] h3 {
+        font-size: 1.5rem !important;
+      }
       .hero {
-        padding: 1.2rem 1.4rem;
+        padding: 1.6rem 1.8rem;
         border: 1px solid rgba(55, 45, 25, 0.12);
         background: rgba(255, 252, 246, 0.82);
         border-radius: 20px;
         box-shadow: 0 12px 30px rgba(78, 63, 28, 0.06);
       }
+      .hero h1 {
+        font-size: 2.6rem !important;
+        line-height: 1.1;
+      }
+      .hero .hero-sub {
+        font-size: 1.25rem;
+        color: #46514a;
+      }
       .doc-card {
-        padding: 1rem 1rem 0.8rem;
+        padding: 1.1rem 1.2rem 0.9rem;
         border: 1px solid rgba(55, 45, 25, 0.10);
         background: rgba(255, 255, 255, 0.82);
         border-radius: 16px;
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.9rem;
       }
       .doc-head {
-        font-size: 1.06rem;
+        font-size: 1.35rem;
         font-weight: 700;
         color: #17261d;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.4rem;
       }
       .doc-meta {
         color: #6a6d67;
-        font-size: 0.9rem;
-        margin-bottom: 0.45rem;
+        font-size: 1.0rem;
+        margin-bottom: 0.55rem;
+      }
+      .doc-card > div:last-child {
+        font-size: 1.1rem;
+        line-height: 1.5;
       }
       mark {
         background: #ffe18f;
         padding: 0.05rem 0.18rem;
         border-radius: 4px;
+      }
+      .sidebar-note {
+        margin-top: 0.6rem;
+        padding: 0.7rem 0.85rem;
+        background: rgba(255, 252, 246, 0.95);
+        border: 1px solid rgba(55, 45, 25, 0.14);
+        border-left: 4px solid #c08a3e;
+        border-radius: 10px;
+        font-size: 1.0rem !important;
+        color: #2a2a26 !important;
+        line-height: 1.4;
+      }
+      .sidebar-note code {
+        background: rgba(192, 138, 62, 0.18);
+        color: #4a2f0d;
+        padding: 0.05rem 0.3rem;
+        border-radius: 4px;
+        font-size: 0.95rem;
+      }
+      .rewrite-card {
+        margin: 0.6rem 0 0.8rem;
+        padding: 0.9rem 1.1rem;
+        background: rgba(255, 252, 246, 0.95);
+        border: 1px solid rgba(55, 45, 25, 0.12);
+        border-left: 5px solid #3f7a52;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(78, 63, 28, 0.05);
+      }
+      .rewrite-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #3f7a52;
+        margin-bottom: 0.45rem;
+      }
+      .rewrite-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .rewrite-chip {
+        font-size: 1.0rem;
+        padding: 0.22rem 0.65rem;
+        border-radius: 999px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        border: 1px solid transparent;
+      }
+      .rewrite-chip.original {
+        background: #e7efe8;
+        color: #1f3a2a;
+        border-color: rgba(63, 122, 82, 0.25);
+      }
+      .rewrite-chip.expansion {
+        background: #fff3d4;
+        color: #5a3d0d;
+        border-color: rgba(192, 138, 62, 0.35);
+        font-weight: 600;
       }
     </style>
     """,
@@ -280,10 +389,10 @@ st.markdown(
 st.markdown(
     """
     <div class="hero">
-      <h1 style="margin:0 0 0.35rem 0;">Total Recall Demo</h1>
-      <div style="font-size:1.02rem; color:#46514a;">
-        AP88 üzerinde BM25, PRF, Extended Boolean, WordNet, Word2Vec ve
-        tolerant retrieval demoları.
+      <h1 style="margin:0 0 0.45rem 0;">Total Recall Demo</h1>
+      <div class="hero-sub">
+        Interactive demos over the AP88 corpus: BM25, PRF, Extended Boolean,
+        WordNet, Word2Vec, and tolerant retrieval.
       </div>
     </div>
     """,
@@ -293,46 +402,60 @@ st.markdown(
 if "demo_query" not in st.session_state:
     st.session_state.demo_query = EXAMPLE_QUERIES[0]
 
+
+def _apply_example() -> None:
+    st.session_state.demo_query = st.session_state.example_pick
+
+
+def _clear_query() -> None:
+    st.session_state.demo_query = ""
+
+
 with st.sidebar:
     st.header("Demo Controls")
-    example = st.selectbox("Example query", EXAMPLE_QUERIES, index=0)
-    if st.button("Use example", use_container_width=True):
-        st.session_state.demo_query = example
+    st.selectbox("Example query", EXAMPLE_QUERIES, index=0, key="example_pick")
+    st.button("Use example", use_container_width=True, on_click=_apply_example)
 
     model_label = st.selectbox("Retrieval mode", list(MODEL_OPTIONS.keys()))
     top_k = st.slider("Top K", min_value=5, max_value=30, value=10, step=5)
     prf_docs = st.selectbox("PRF fb_docs", [3, 5, 10], index=0)
     ext_p = st.select_slider("Extended Boolean p", options=[1.5, 2.0, 3.0], value=1.5)
 
-    st.caption("Tuned BM25 base: k1=1.8, b=0.5")
-    st.caption("Wildcard denemek için tolerant mode + örn. `insur* coverage`")
+    st.markdown(
+        """
+        <div class="sidebar-note">
+          <b>Tuned BM25 base:</b> <code>k1 = 1.8</code>, <code>b = 0.5</code>.
+        </div>
+        <div class="sidebar-note">
+          <b>Wildcards:</b> pick the <i>Tolerant Retrieval</i> mode and try
+          something like <code>insur* coverage</code>.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 query = st.text_input(
     "Query",
     key="demo_query",
-    placeholder="Örn. oil spills",
+    placeholder="e.g. oil spills",
 )
 
 col_a, col_b = st.columns([1, 1])
 with col_a:
     search_clicked = st.button("Search", type="primary", use_container_width=True)
 with col_b:
-    clear_clicked = st.button("Clear", use_container_width=True)
-
-if clear_clicked:
-    st.session_state.demo_query = ""
-    st.rerun()
+    st.button("Clear", use_container_width=True, on_click=_clear_query)
 
 if search_clicked:
     if not query.strip():
-        st.warning("Önce bir sorgu girmen gerekiyor.")
+        st.warning("Please enter a query first.")
     else:
         mode = MODEL_OPTIONS[model_label]
         try:
             rewrite = _rewrite_preview(mode, query)
         except Exception as exc:
             rewrite = None
-            st.info(f"Rewrite preview alınamadı: {exc}")
+            st.info(f"Could not build a rewrite preview: {exc}")
 
         with st.spinner("Searching AP88..."):
             try:
@@ -345,20 +468,20 @@ if search_clicked:
                     ext_p=ext_p,
                 )
             except Exception as exc:
-                st.error(f"Arama çalıştırılamadı: {exc}")
+                st.error(f"Search failed: {exc}")
                 results = pd.DataFrame()
 
         if rewrite and rewrite != query:
-            st.caption(f"Rewritten query: `{rewrite}`")
+            st.markdown(_render_rewrite(query, rewrite), unsafe_allow_html=True)
 
         if mode != "tolerant" and "*" in query:
-            st.info("Wildcard sorgular pratikte tolerant mode ile daha anlamlı çalışır.")
+            st.info("Wildcard queries are only meaningful in the tolerant retrieval mode.")
 
         if results.empty:
-            st.warning("Sonuç bulunamadı.")
+            st.warning("No results found.")
         else:
             docs = _doc_store()
-            st.success(f"{len(results)} sonuç gösteriliyor.")
+            st.success(f"Showing {len(results)} result(s).")
             for row in results.itertuples(index=False):
                 doc = docs.get(str(row.docno), {"head": "", "text": ""})
                 title = doc["head"] or str(row.docno)
@@ -368,7 +491,7 @@ if search_clicked:
                     <div class="doc-card">
                       <div class="doc-head">{html.escape(title)}</div>
                       <div class="doc-meta">rank #{int(row.rank)} · docno {html.escape(str(row.docno))} · score {float(row.score):.4f}</div>
-                      <div>{snippet or "Snippet bulunamadı."}</div>
+                      <div>{snippet or "No snippet available."}</div>
                     </div>
                     """,
                     unsafe_allow_html=True,
