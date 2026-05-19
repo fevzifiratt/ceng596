@@ -23,8 +23,11 @@ Opens a local query UI for trying the project pipelines interactively:
 tuned BM25, PRF, Extended Boolean, WordNet, Word2Vec, and tolerant
 retrieval with snippets.
 
-Requires Step 1 (data prep) to have been run at least once so the
-Terrier indexes and parsed topics/qrels are on disk.
+Only requires the AP corpus at `data/raw/coll/`. On first launch, the
+Streamlit app will lazily build whatever caches the selected mode
+needs — Terrier index (~2 min), Word2Vec model, tolerant vocabulary —
+and reuse them on subsequent runs. The WordNet mode additionally
+requires `nltk_data/` (see Step 6 for the one-time NLTK download).
 
 ## Layout
 
